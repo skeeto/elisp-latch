@@ -1,4 +1,4 @@
-# Latches and Promises in Emacs Lisp
+# Promises and Latches for Emacs Lisp
 
 This package (ab)uses `accept-process-output` and processes to provide
 asynchronous blocking, allowing other functions to run before the

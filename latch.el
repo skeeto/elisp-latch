@@ -1,4 +1,4 @@
-;;; latch.el --- blocking latches and promises for Elisp
+;;; latch.el --- promises and latches for Elisp
 
 ;; This is free and unencumbered software released into the public domain.
 
