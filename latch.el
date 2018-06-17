@@ -69,15 +69,15 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'eieio)
+(require 'cl-lib)
 
 (defclass latch ()
   ((process :initform (start-process "latch" nil nil))
    (value :initform nil))
   :documentation "A blocking latch that can be used any number of times.")
 
-(defmethod wait ((latch latch) &optional timeout)
+(cl-defmethod wait ((latch latch) &optional timeout)
   "Blocking wait on LATCH for a corresponding `notify', returning
 the value passed by the notification. Wait at most TIMEOUT
 seconds (float allowed), returning nil if the timeout was reached
@@ -86,12 +86,12 @@ period but I/O and timers will continue to run."
   (accept-process-output (slot-value latch 'process) timeout)
   (slot-value latch 'value))
 
-(defmethod notify ((latch latch) &optional value)
+(cl-defmethod notify ((latch latch) &optional value)
   "Release all execution contexts waiting on LATCH, passing them VALUE."
   (setf (slot-value latch 'value) value)
   (process-send-string (slot-value latch 'process) "\n"))
 
-(defmethod destroy ((latch latch))
+(cl-defmethod destroy ((latch latch))
   "Destroy a latch, since they can't be fully memory managed."
   (ignore-errors
     (delete-process (slot-value latch 'process))))
@@ -104,9 +104,9 @@ will not be garbage collected."
 
 (defun destroy-all-latches ()
   "Destroy all known latches."
-  (loop for process in (process-list)
-        when (string-match-p "latch\\(<[0-9]+>\\)?" (process-name process))
-        do (delete-process process)))
+  (cl-loop for process in (process-list)
+           when (string-match-p "latch\\(<[0-9]+>\\)?" (process-name process))
+           do (delete-process process)))
 
 ;; One-use latches
 
@@ -114,7 +114,7 @@ will not be garbage collected."
   ()
   :documentation "A latch that is destroyed automatically after one use.")
 
-(defmethod wait :after ((latch one-time-latch) &optional timeout)
+(cl-defmethod wait :after ((latch one-time-latch) &optional timeout)
   (destroy latch))
 
 (defun make-one-time-latch ()
@@ -129,7 +129,7 @@ will not be garbage collected."
    (value :initform nil))
   :documentation "Promise built on top of a one-time latch.")
 
-(defmethod deliver ((promise promise) value)
+(cl-defmethod deliver ((promise promise) value)
   "Deliver a VALUE to PROMISE, releasing any execution contexts
 waiting on it."
   (if (slot-value promise 'delivered)
@@ -138,7 +138,7 @@ waiting on it."
     (setf (slot-value promise 'delivered) t)
     (notify (slot-value promise 'latch) value)))
 
-(defmethod retrieve ((promise promise))
+(cl-defmethod retrieve ((promise promise))
   "Resolve the value for PROMISE, blocking if necessary. The
 Emacs display will freeze, but I/O and timers will continue to
 run."
