@@ -22,7 +22,7 @@
 
 ;; (`wait' latch &optional timeout)
 ;;    Blocking wait on a latch for a `notify'.
-;; (`nodify' latch &optional value)
+;; (`notify' latch &optional value)
 ;;    Resume all executation contexts waiting on the latch.
 ;; (`destroy' latch)
 ;;    Free resources consumed by the latch.
